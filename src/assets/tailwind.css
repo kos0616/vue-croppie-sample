@@ -1,0 +1,28 @@
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+
+@layer components {
+  .card {
+    @apply bg-white text-gray-500 rounded-lg mb-5 shadow-sm
+  }
+
+  .card .card-item {
+    @apply relative block py-3 px-2 transition-colors;
+  }
+
+  .card .card-item:hover {
+    @apply bg-gray-50 text-cyan-600;
+  }
+
+  .card .card-item::after {
+    @apply block absolute left-2 right-2 bottom-0 h-px bg-gray-200;
+  }
+
+  .card .card-item:last-child::after {
+    @apply hidden;
+  }
+}
