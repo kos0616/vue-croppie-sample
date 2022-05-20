@@ -20,6 +20,7 @@
     </div>
     <div class="text-center">
       <button
+        v-if="CROP_INST"
         @click="getCrop"
         type="button"
         class="rounded bg-amber-400 px-3 py-2 hover:bg-amber-500"
@@ -36,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref } from "vue";
+import { defineComponent, onUnmounted, ref } from "vue";
 import Croppie from "croppie";
 import "croppie/croppie.css";
 
@@ -55,14 +56,32 @@ export default defineComponent({
       const _reader = new FileReader();
       _reader.onload = (e) => {
         if (typeof e.target?.result === "string") {
-          generateCrop(e.target?.result);
+          setCrop(e.target?.result);
         }
       };
       _reader.readAsDataURL(files[0]);
     };
 
-    const generateCrop = (url: string) => {
+    /**
+     * 若 Crop 尚未產生，則建立一個實體
+     * 若已存在實體，則變更圖片
+     */
+    const setCrop = (url: string) => {
       if (CROP_INST.value !== null) {
+        CROP_INST.value.bind({ url });
+        return;
+      }
+      generateCrop(url);
+    };
+
+    /** 產生一個 Crop */
+    const generateCrop = (url: string) => {
+      const app = REF_CROP.value;
+      if (app !== null) {
+        CROP_INST.value = new Croppie(app, {
+          viewport: { width: 150, height: 150 },
+          boundary: { width: 200, height: 200 },
+        });
         CROP_INST.value.bind({ url });
       }
     };
@@ -76,22 +95,11 @@ export default defineComponent({
       }
     };
 
-    const initCrop = () => {
-      const app = REF_CROP.value;
-      if (app !== null) {
-        CROP_INST.value = new Croppie(app, {
-          viewport: { width: 150, height: 150 },
-          boundary: { width: 200, height: 200 },
-        });
-        CROP_INST.value.bind({ url: require("../src/assets/logo.png") });
-      }
-    };
-
     const removeCrop = () => {
       if (CROP_INST.value) CROP_INST.value?.destroy();
     };
 
-    onMounted(() => initCrop());
+    // onMounted(() => initCrop());
 
     onUnmounted(() => removeCrop());
 
@@ -100,6 +108,7 @@ export default defineComponent({
       handelUpload,
       getCrop,
       CROP_RESULT,
+      CROP_INST,
     };
   },
 });
