@@ -1,7 +1,9 @@
 # vue-croppie-sample
 
-A sample by using croppiejs in vuejs 3
+A sample by using croppie in vuejs 3
 [demo](https://kos0616.github.io/vue-croppie-sample/)
+
+[doc](https://foliotek.github.io/Croppie/)
 
 ## Project setup
 

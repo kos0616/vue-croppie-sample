@@ -1,38 +1,45 @@
 <template>
-  <div
-    class="max-w-xl mx-auto h-screen overflow-hidden border flex flex-col justify-center"
-  >
-    <label
-      class="w-48 h-48 bg-gray-200 rounded-lg jz-card block mx-auto p-9 text-center border-gray-300 border"
-    >
-      <i class="pb-3 text-amber-600 block">+</i>
-      <strong class="block">Upload Image</strong>
-      <input
-        @change="handelUpload"
-        type="file"
-        accept="image/*"
-        class="opacity-0 w-px h-px absolute left-0 top-0"
-      />
-    </label>
-
-    <div class="mt-5">
+  <div class="max-w-xl mx-auto h-screen py-20">
+    <div class="card">
+      <label v-if="!CROP_INST" class="p-9 h-full flex flex-col justify-center">
+        <span class="text-4xl font-extrabold pb-3 text-amber-600 block">+</span>
+        <strong class="block">Upload Image</strong>
+        <input
+          @change="handelUpload"
+          type="file"
+          accept="image/*"
+          class="opacity-0 w-px h-px absolute left-0 top-0"
+        />
+      </label>
+      <div v-else class="text-right">
+        <button
+          @click="removeCrop"
+          type="button"
+          class="py-2 px-3 font-extrabold"
+          title="Remove"
+        >
+          X
+        </button>
+      </div>
       <div ref="REF_CROP"></div>
-    </div>
-    <div class="text-center">
       <button
         v-if="CROP_INST"
         @click="getCrop"
         type="button"
-        class="rounded bg-amber-400 px-3 py-2 hover:bg-amber-500"
+        class="rounded bg-amber-400 px-3 py-2 hover:bg-amber-500 mt-auto mb-5"
       >
         Get image
       </button>
     </div>
-    <img
-      v-if="CROP_RESULT"
-      :src="CROP_RESULT"
-      class="mx-auto mb-3 rounded border p-3 mt-5"
-    />
+
+    <div v-if="CROP_INST" class="card h-[250px]">
+      <div class="flex flex-col justify-center p-5 h-full">
+        <figure class="mx-auto mb-3 border p-2 rounded">
+          <img v-if="CROP_RESULT" :src="CROP_RESULT" />
+          <div v-else class="w-[150px] h-[150px] bg-gray-100"></div>
+        </figure>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -81,6 +88,7 @@ export default defineComponent({
         CROP_INST.value = new Croppie(app, {
           viewport: { width: 150, height: 150 },
           boundary: { width: 200, height: 200 },
+          customClass: "h-auto",
         });
         CROP_INST.value.bind({ url });
       }
@@ -96,10 +104,12 @@ export default defineComponent({
     };
 
     const removeCrop = () => {
-      if (CROP_INST.value) CROP_INST.value?.destroy();
+      if (CROP_INST.value) {
+        CROP_INST.value?.destroy();
+        CROP_INST.value = null;
+        CROP_RESULT.value = "";
+      }
     };
-
-    // onMounted(() => initCrop());
 
     onUnmounted(() => removeCrop());
 
@@ -109,7 +119,17 @@ export default defineComponent({
       getCrop,
       CROP_RESULT,
       CROP_INST,
+      removeCrop,
     };
   },
 });
 </script>
+
+<style lang="postcss">
+html {
+  @apply bg-gray-200;
+}
+.card {
+  @apply rounded-lg block mx-auto text-center border-gray-300 border shadow w-[300px];
+}
+</style>
